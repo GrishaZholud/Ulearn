@@ -1,12 +1,18 @@
 package CalculateType;
 
+import java.util.Arrays;
+
 public class Calculator {
 
     public static String calculate(String input) {
         String[] array = input.split(" ");
         String operation = array[1];
-        if (Character.isLetter(array[0].charAt(0)) && Character.isLetter(array[2].charAt(0))) {
-            return calculate(array[0], array[2], operation);
+        try {
+            if (Character.isLetter(array[0].charAt(0)) && Character.isLetter(array[2].charAt(0))) {
+                return calculate(array[0], array[2], operation);
+            }
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
         }
         double a = Double.parseDouble(array[0]);
         double b = Double.parseDouble(array[2]);
@@ -15,35 +21,44 @@ public class Calculator {
     }
 
     private static String calculate(String a, String b, String operation) {
-        if (operation.equals("+")) {
-            return a + b;
-        }
-        if (operation.equals("-")) {
-            if (a.contains(b)) {
-                return a.replace(b, "");
-            }
+        switch (operation) {
+            case "+":
+                return a + b;
+            case "-":
+                if (a.contains(b)) {
+                    return a.replace(b, "");
+                }
         }
         throw new IllegalArgumentException();
     }
 
     private static double calculate(double a, double b, String operation) {
 
-        return switch (operation) {
-            case "+" -> a + b;
-            case "-" -> a - b;
-            case "/" -> b == 0 ? 0 : a / b;
-            case "*" -> a * b;
-            case "%" -> a % b;
-            default -> 0;
-        };
+        switch (operation) {
+            case "+":
+                return a + b;
+            case "-":
+                return a - b;
+            case "/":
+                if (b == 0) {
+                    throw new IllegalArgumentException();
+                }
+                return a / b;
+            case "*":
+                return a * b;
+            case "%":
+                return a % b;
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     public static int getNumbers(int a, int b) {
         String numberToString = String.valueOf(Math.abs(a + b));
-        String[] array = numberToString.split("");
+        char[] array = numberToString.toCharArray();
         int result = 0;
-        for (String s : array) {
-            if (Integer.parseInt(s) % 2 == 0) {
+        for (char s : array) {
+            if (s % 2 == 0) {
                 result++;
             }
         }
@@ -51,14 +66,17 @@ public class Calculator {
     }
 
     public static String getMinimalType(String input) {
+        if (input.matches("[0-9]")) {
+            throw new IllegalArgumentException();
+        }
         long number = Long.parseLong(input);
-        if (number > 2147483647 || number < -2147483648) {
+        if (number > Integer.MAX_VALUE || number < Integer.MIN_VALUE) {
             return "Long";
         }
-        if (number > 32767 || number < -32768) {
+        if (number > Short.MAX_VALUE || number < Short.MIN_VALUE) {
             return "Int";
         }
-        if (number > 127 || number < -128) {
+        if (number > Byte.MAX_VALUE || number < Byte.MIN_VALUE) {
             return "Short";
         }
         return "Byte";
